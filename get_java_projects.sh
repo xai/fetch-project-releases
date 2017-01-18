@@ -36,7 +36,7 @@
 # This is where the code is stored.                                               #
 ###################################################################################
 
-CODE_BASE_DIR="/tmp/src/"
+CODE_BASE_DIR="/tmp/src"
 
 if [ -z "$TOKEN" ]
 then
