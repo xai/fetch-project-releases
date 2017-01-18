@@ -47,8 +47,8 @@ storing release v1.1.6 as /tmp/src/ReactiveX/RxJava/v1.1.6.tar.gz
 ```
 
 ## TODO
-- reimplement this in python by using a proper json parser instead of banging the output with sed
-- use pagination to retrieve more than 30 projects
-- use arg parser to provide target directory via command line argument
-- prune filter non-java files from repository
-- create a pull request that resolves all the todos (I'll happily pull) :)
+- [ ] [reimplement this in python by using a proper json parser instead of banging the output with sed](/../../issues/4)
+- [ ] [use pagination to retrieve more than 30 projects](/../../issues/1)
+- [ ] [use arg parser to provide target directory via command line argument](/../../issues/2)
+- [ ] [prune non-java files from repository](/../../issues/3)
+- [ ] create a pull request that resolves all the todos (I'll happily pull) :)
