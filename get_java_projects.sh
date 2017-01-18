@@ -40,10 +40,10 @@ CODE_BASE_DIR="/tmp/src"
 
 if [ -z "$TOKEN" ]
 then
-	echo "You have to register and API token and adjust the value of TOKEN in your environment accordingly."
-	echo "See https://help.github.com/articles/creating-an-access-token-for-command-line-use/ on how to do this."
+	echo "You have to register an API token and adjust the value of TOKEN in your environment accordingly."
+	echo "See https://help.github.com/articles/creating-an-access-token-for-command-line-use/ on how to register a token."
 	echo
-	echo "E.g., call this script like this:"
+	echo "If you have a valid API token, call this script like this:"
 	echo "\$ TOKEN=\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\" $0"
 	exit 1
 fi
