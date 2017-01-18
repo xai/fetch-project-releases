@@ -30,18 +30,21 @@
 # https://help.github.com/articles/creating-an-access-token-for-command-line-use/ #
 # on how to do this.                                                              #
 #                                                                                 #
-# Set the value of TOKEN in this script to the appropriate value.                 #
+# Set the value of TOKEN in the environment to the appropriate value.             #
 #                                                                                 #
-# Also set CODE_BASE_DIR to something meaningful.                                 #
+# Also set CODE_BASE_DIR in this script to something meaningful.                  #
 # This is where the code is stored.                                               #
 ###################################################################################
 
-TOKEN=""
 CODE_BASE_DIR="/tmp/src/"
 
 if [ -z "$TOKEN" ]
 then
-	echo "You have to register and API token and adjust the value of TOKEN in $0 accordingly"
+	echo "You have to register and API token and adjust the value of TOKEN in your environment accordingly."
+	echo "See https://help.github.com/articles/creating-an-access-token-for-command-line-use/ on how to do this."
+	echo
+	echo "E.g., call this script like this:"
+	echo "\$ TOKEN=\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\" $0"
 	exit 1
 fi
 
