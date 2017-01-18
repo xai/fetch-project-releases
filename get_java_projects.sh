@@ -49,7 +49,7 @@ then
 fi
 
 for tags_url in \
-	$(curl -H "Authorization: token ${TOKEN}" 'https://api.github.com/search/repositories?q=language:java&sort=stars&order=desc' 2>/dev/null \
+	$(curl -sH "Authorization: token ${TOKEN}" 'https://api.github.com/search/repositories?q=language:java&sort=stars&order=desc' 2>/dev/null \
 	| egrep '[[:space:]]*"tags_url":' \
 	| sed 's/[[:space:]]\+\"tags_url\": \"\([^\"]\+\)\".*,/\1/g')
 do
@@ -59,14 +59,14 @@ do
 	echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
 	codedir=${CODE_BASE_DIR}/${user}/${project}
 	mkdir -p $codedir
-	for release_url in $(curl -H "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
+	for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
 		| egrep '[[:space:]]*"tarball_url":' \
 		| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
 	do
 		release=$(echo "$release_url" | sed 's/.*\///')
 		target="${codedir}/${release}.tar.gz"
 		echo "storing release ${release} as ${target}"
-		wget -q -O $target "$release_url"
+		curl -s -L -o $target "$release_url"
 	done
 	echo
 done
