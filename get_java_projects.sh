@@ -56,18 +56,17 @@ do
 	read user project <<< \
 		$(echo "$tags_url" \
 		| sed 's/https:\/\/api\.github\.com\/repos\/\([^\/]\+\)\/\([^\/]\+\).*/\1 \2/g')
-	echo $tags_url
-	echo "Retrieving releases for: ${user}/${project}"
+	echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
 	codedir=${CODE_BASE_DIR}/${user}/${project}
 	mkdir -p $codedir
 	for release_url in $(curl -H "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
 		| egrep '[[:space:]]*"tarball_url":' \
 		| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
 	do
-		echo $release_url
 		release=$(echo "$release_url" | sed 's/.*\///')
-		echo "Retrieving release ${release}"
-		wget -q -O ${codedir}/${release}.tar.gz "$release_url"
+		target="${codedir}/${release}.tar.gz"
+		echo "storing release ${release} as ${target}"
+		wget -q -O $target "$release_url"
 	done
 	echo
 done
