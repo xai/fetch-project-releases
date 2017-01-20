@@ -37,6 +37,8 @@
 ###################################################################################
 
 CODE_BASE_DIR="/tmp/src"
+NUM=40
+DRY_RUN=true
 
 if [ -z "$TOKEN" ]
 then
@@ -48,25 +50,46 @@ then
 	exit 1
 fi
 
-for tags_url in \
-	$(curl -sH "Authorization: token ${TOKEN}" 'https://api.github.com/search/repositories?q=language:java&sort=stars&order=desc' 2>/dev/null \
-	| egrep '[[:space:]]*"tags_url":' \
-	| sed 's/[[:space:]]\+\"tags_url\": \"\([^\"]\+\)\".*,/\1/g')
+projects=0
+releases=0
+page=1
+
+while [ $projects -lt $NUM ]
 do
-	read user project <<< \
-		$(echo "$tags_url" \
-		| sed 's/https:\/\/api\.github\.com\/repos\/\([^\/]\+\)\/\([^\/]\+\).*/\1 \2/g')
-	echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
-	codedir=${CODE_BASE_DIR}/${user}/${project}
-	mkdir -p $codedir
-	for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
-		| egrep '[[:space:]]*"tarball_url":' \
-		| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
+	for tags_url in \
+		$(curl -sH "Authorization: token ${TOKEN}" "https://api.github.com/search/repositories?q=language:java&sort=stars&order=desc&page=${page}" 2>/dev/null \
+		| egrep '[[:space:]]*"tags_url":' \
+		| sed 's/[[:space:]]\+\"tags_url\": \"\([^\"]\+\)\".*,/\1/g')
 	do
-		release=$(echo "$release_url" | sed 's/.*\///')
-		target="${codedir}/${release}.tar.gz"
-		echo "storing release ${release} as ${target}"
-		curl -s -L -o $target "$release_url"
+		read user project <<< \
+			$(echo "$tags_url" \
+			| sed 's/https:\/\/api\.github\.com\/repos\/\([^\/]\+\)\/\([^\/]\+\).*/\1 \2/g')
+		echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
+		codedir=${CODE_BASE_DIR}/${user}/${project}
+		mkdir -p $codedir
+		for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
+			| egrep '[[:space:]]*"tarball_url":' \
+			| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
+		do
+			release=$(echo "$release_url" | sed 's/.*\///')
+			target="${codedir}/${release}.tar.gz"
+			echo "storing release ${release} as ${target}"
+			if [ "$DRY_RUN" = false ]
+			then
+				curl -s -L -o $target "$release_url"
+			fi
+			let releases+=1
+		done
+		let projects+=1
+		echo
+
+		if [ $projects -eq $NUM ]
+		then
+			break;
+		fi
 	done
-	echo
+
+	let page+=1
 done
+
+echo "${releases} releases of ${projects} projects downloaded."
