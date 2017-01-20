@@ -9,11 +9,12 @@ This is an ugly proof of concept hack. See [TODO](#todo).
 You have to register an API token first!  
 Please see [this](https://help.github.com/articles/creating-an-access-token-for-command-line-use/) on how to generate a token.
 
-Also set CODE_BASE_DIR in the script to something meaningful.  
-This is where the code is stored.
-
 ## Run
 `$ TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ./get_java_projects.sh`
+
+By default, the top 30 projects are considered. Use `-n <some_number>` to adjust this value accordingly.  
+Use `-o <path/to/directory>` to specify where the releases are stored. Please note that running this script can consume quite some disk space, as each release is a tar.gz!  
+Use `-d` (for dry-run) to simulate an actual run but do not download anything.
 
 ## Output
 Releases are stored as tar.gz files in a file system hierarchy resembling githubs user/project structure.
