@@ -31,9 +31,6 @@
 # on how to do this.                                                              #
 #                                                                                 #
 # Set the value of TOKEN in the environment to the appropriate value.             #
-#                                                                                 #
-# Also set CODE_BASE_DIR in this script to something meaningful.                  #
-# This is where the code is stored.                                               #
 ###################################################################################
 
 CODE_BASE_DIR="/tmp/src"
@@ -49,6 +46,37 @@ then
 	echo "\$ TOKEN=\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\" $0"
 	exit 1
 fi
+
+usage () {
+	echo >&2
+	echo >&2 "Usage: $0 [-d] [-n number of projects] [-o output directory]"
+	echo >&2 "   -d: dry-run. Do not download anything"
+	echo >&2 "   -n number: Number of projects that should be fetched"
+	echo >&2 "   -o path: Path to output directory"
+	echo >&2
+}
+
+# Reset in case getopts has been used previously in the shell.
+OPTIND=1
+
+while getopts "h?dn:o:" opt; do
+	case "$opt" in
+		h|\?)
+			usage
+			exit 0
+			;;
+		d)  DRY_RUN=true
+			;;
+		n)  NUM=$OPTARG
+			;;
+		o)  CODE_BASE_DIR=$OPTARG
+			;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+[ "$1" = "--" ] && shift
 
 projects=0
 releases=0
