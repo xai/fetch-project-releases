@@ -38,7 +38,7 @@
 
 CODE_BASE_DIR="/tmp/src"
 NUM=40
-DRY_RUN=true
+DRY_RUN=false
 
 if [ -z "$TOKEN" ]
 then
@@ -66,7 +66,10 @@ do
 			| sed 's/https:\/\/api\.github\.com\/repos\/\([^\/]\+\)\/\([^\/]\+\).*/\1 \2/g')
 		echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
 		codedir=${CODE_BASE_DIR}/${user}/${project}
-		mkdir -p $codedir
+		if [ "$DRY_RUN" = false ]
+		then
+			mkdir -p $codedir
+		fi
 		for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
 			| egrep '[[:space:]]*"tarball_url":' \
 			| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
