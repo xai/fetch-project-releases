@@ -105,7 +105,7 @@ do
 			release=$(echo "$release_url" | sed 's/.*\///')
 			target="${codedir}/${release}.tar.gz"
 			echo "storing release ${release} as ${target}"
-			if [ "$DRY_RUN" = false ]
+			if [ "$DRY_RUN" = false ] && [ ! -f "$target" ]
 			then
 				curl -s -L -o $target "$release_url"
 			fi
