@@ -14,7 +14,8 @@ Please see [this](https://help.github.com/articles/creating-an-access-token-for-
 
 By default, the top 30 projects are considered. Use `-n <some_number>` to adjust this value accordingly.  
 Use `-o <path/to/directory>` to specify where the releases are stored. Please note that running this script can consume quite some disk space, as each release is a tar.gz!  
-Use `-d` (for dry-run) to simulate an actual run but do not download anything.
+Use `-c` to simply clone the repositories with git instead of fetching release tarballs.  
+Use `-d` (for dry-run) to simulate an actual run but do not download or clone anything.
 
 ## Output
 Releases are stored as tar.gz files in a file system hierarchy resembling githubs user/project structure.
