@@ -102,8 +102,15 @@ do
 			mkdir -p $codedir
 		fi
 
-		if [ "$CLONE" = false ]
+		if [ "$CLONE" = true ]
 		then
+			# clone repository
+			echo "Cloning: ${user}/${project} (https://github.com/${user}/${project})"
+			if [ "$DRY_RUN" = false ]
+			then
+				git clone https://github.com/${user}/${project} ${codedir}
+			fi
+		else
 			# fetch all releases
 			echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
 			for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
@@ -119,13 +126,6 @@ do
 				fi
 				let releases+=1
 			done
-		else
-			# clone repository
-			echo "Cloning: ${user}/${project} (https://github.com/${user}/${project})"
-			if [ "$DRY_RUN" = false ]
-			then
-				git clone https://github.com/${user}/${project} ${codedir}
-			fi
 		fi
 		let projects+=1
 		echo
@@ -139,10 +139,10 @@ do
 	let page+=1
 done
 
-if [ "$CLONE" = false ]
+if [ "$CLONE" = true ]
 then
-	echo "${releases} releases of ${projects} projects downloaded."
-else
 	echo "${projects} projects cloned."
+else
+	echo "${releases} releases of ${projects} projects downloaded."
 fi
 
