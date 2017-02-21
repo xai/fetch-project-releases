@@ -36,6 +36,7 @@
 CODE_BASE_DIR="/tmp/src"
 NUM=30
 DRY_RUN=false
+CLONE=false
 
 if [ -z "$TOKEN" ]
 then
@@ -50,6 +51,7 @@ fi
 usage () {
 	echo >&2
 	echo >&2 "Usage: $0 [-d] [-n number of projects] [-o output directory]"
+	echo >&2 "   -c: clone. Clone github repositories instead of fetching releases"
 	echo >&2 "   -d: dry-run. Do not download anything"
 	echo >&2 "   -n number: Number of projects that should be fetched"
 	echo >&2 "   -o path: Path to output directory"
@@ -59,11 +61,13 @@ usage () {
 # Reset in case getopts has been used previously in the shell.
 OPTIND=1
 
-while getopts "h?dn:o:" opt; do
+while getopts "h?cdn:o:" opt; do
 	case "$opt" in
 		h|\?)
 			usage
 			exit 0
+			;;
+		c)  CLONE=true
 			;;
 		d)  DRY_RUN=true
 			;;
@@ -92,25 +96,37 @@ do
 		read user project <<< \
 			$(echo "$tags_url" \
 			| sed 's/https:\/\/api\.github\.com\/repos\/\([^\/]\+\)\/\([^\/]\+\).*/\1 \2/g')
-		echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
 		codedir=${CODE_BASE_DIR}/${user}/${project}
 		if [ "$DRY_RUN" = false ]
 		then
 			mkdir -p $codedir
 		fi
-		for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
-			| egrep '[[:space:]]*"tarball_url":' \
-			| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
-		do
-			release=$(echo "$release_url" | sed 's/.*\///')
-			target="${codedir}/${release}.tar.gz"
-			echo "storing release ${release} as ${target}"
+
+		if [ "$CLONE" = false ]
+		then
+			# fetch all releases
+			echo "Retrieving releases for: ${user}/${project} (https://github.com/${user}/${project})"
+			for release_url in $(curl -sH "Authorization: token ${TOKEN}" "${tags_url}" 2>/dev/null \
+				| egrep '[[:space:]]*"tarball_url":' \
+				| sed 's/[[:space:]]*\"tarball_url\": \"\([^\"]\+\)\".*/\1/')
+			do
+				release=$(echo "$release_url" | sed 's/.*\///')
+				target="${codedir}/${release}.tar.gz"
+				echo "storing release ${release} as ${target}"
+				if [ "$DRY_RUN" = false ]
+				then
+					curl -s -L -o $target -C - "$release_url"
+				fi
+				let releases+=1
+			done
+		else
+			# clone repository
+			echo "Cloning: ${user}/${project} (https://github.com/${user}/${project})"
 			if [ "$DRY_RUN" = false ]
 			then
-				curl -s -L -o $target -C - "$release_url"
+				git clone https://github.com/${user}/${project} ${codedir}
 			fi
-			let releases+=1
-		done
+		fi
 		let projects+=1
 		echo
 
@@ -123,4 +139,10 @@ do
 	let page+=1
 done
 
-echo "${releases} releases of ${projects} projects downloaded."
+if [ "$CLONE" = false ]
+then
+	echo "${releases} releases of ${projects} projects downloaded."
+else
+	echo "${projects} projects cloned."
+fi
+
