@@ -105,10 +105,19 @@ do
 		if [ "$CLONE" = true ]
 		then
 			# clone repository
-			echo "Cloning: ${user}/${project} (https://github.com/${user}/${project})"
 			if [ "$DRY_RUN" = false ]
 			then
-				git clone https://github.com/${user}/${project} ${codedir}
+				if [ -d ${codedir}/.git ]
+				then
+					echo "Updating: ${user}/${project} (https://github.com/${user}/${project})"
+					curdir=${PWD}
+					cd ${codedir}
+					git pull
+					cd ${curdir}
+				else
+					echo "Cloning: ${user}/${project} (https://github.com/${user}/${project})"
+					git clone https://github.com/${user}/${project} ${codedir}
+				fi
 			fi
 		else
 			# fetch all releases
